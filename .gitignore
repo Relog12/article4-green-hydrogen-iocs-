@@ -1,0 +1,7 @@
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+results/*.nc
+results/*.parquet
+.DS_Store
+Thumbs.db
