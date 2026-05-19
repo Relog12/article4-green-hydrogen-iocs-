@@ -25,13 +25,17 @@ Python 3.11, PyPSA 0.35.1, HiGHS solver. To rebuild:
 
 ## Methodology in three layers
 
-L1: Deterministic capacity expansion (5 firms by 3 climate scenarios by 2 foresight modes = 30 runs). PyPSA + HiGHS.
+L1: Deterministic capacity expansion (5 firms x 3 climate scenarios x 2 foresight modes = 30 runs). PyPSA + HiGHS.
 L2: Stochastic LCOH on fixed capacities (10000 MC). NumPy / pandas.
 L3: Real options analysis (Longstaff-Schwartz). NumPy.
 
-## Investment horizon
+## Temporal representation
 
-2025-2050 in 5-year steps. Discount rate 5 percent. Vintages with lifetime decommissioning.
+Time series aggregation via tsam: 12 representative days + 2 extreme days,
+preserving annual means within 3 percent. Extreme days captured via addPeakMax
+on price and addPeakMin on solar, ensuring Dunkelflaute events constrain the
+capacity expansion decision. Resulting model: 2016 snapshots over 6 investment
+periods (2025-2050).
 
 ## Climate scenarios (from IEA WEO)
 
@@ -46,13 +50,15 @@ Shell plc, TotalEnergies SE, BP plc, Eni S.p.A., Repsol S.A.
 ## Status
 
 - [x] Environment frozen (PyPSA 0.35.1, pandas 2.2.3, numpy 1.26.4)
-- [x] PyPSA multi-period model running (1554 vars, optimal in under 2s)
+- [x] PyPSA multi-period model running (typical days, ~5s/run)
 - [x] Excel data template (12 sheets, defensive loaders)
 - [x] CO2 budget constraint per firm (GlobalConstraint, primary_energy)
 - [x] MACC pipeline (budget sweep + shadow prices + cost-emissions trade-off)
+- [x] Typical days via tsam (12 typical + 2 extreme, 14-day representation)
+- [x] Comparative analysis 24h synthetic vs typical days
 - [ ] Data collection in workbook (in progress)
-- [ ] Typical days via tsam
 - [ ] Couple load_cost_params to PyPSA (replace placeholder CAPEX_TRAJ)
+- [ ] Additional supply technologies (H2 storage, H2 imports, blue H2)
 - [ ] Full 30-run pipeline (5 firms x 3 scenarios x 2 foresight modes)
 - [ ] L2 Monte Carlo LCOH
 - [ ] L3 Longstaff-Schwartz real options
@@ -60,12 +66,29 @@ Shell plc, TotalEnergies SE, BP plc, Eni S.p.A., Repsol S.A.
 
 ## Key results so far (synthetic data, placeholder costs)
 
-- Unconstrained baseline: 2.62 MtCO2 cumulative 2025-2050, NPV 741 M Eur
-- 50 percent CO2 budget: NPV +26.5 percent, shadow price 114 Eur/tCO2
-- MACC knee at ~95 percent decarbonisation, last 5 percent costs above 2000 Eur/tCO2
+- 24h synthetic baseline: 2.62 MtCO2 cumulative 2025-2050, NPV 741 M EUR
+- Typical days baseline: 3.52 MtCO2 cumulative, NPV 750 M EUR (+34 percent CO2 for +1 percent NPV)
+- 50 percent CO2 budget: shadow price 114 EUR/tCO2 (with 24h)
+- Typical days expose technical infeasibility for budgets below 10 percent
+  of baseline, indicating that >90 percent decarbonisation via supply-side
+  alone requires technologies absent from current model (H2 imports, long
+  duration storage, or blue H2).
+
+## Methodology notes for paper
+
+- tsam aggregation preserves annual means within 3 percent for solar CF,
+  2 percent for wind CF, 0.1 percent for electricity price.
+- Cluster 12 (2 days per year, wind CF 0.006, price 91 EUR/MWh) acts as
+  Dunkelflaute event that materially constrains firm capacity sizing.
+- Models that omit such extreme days systematically over-estimate the
+  share of renewable supply that is economically rational, biasing
+  decarbonisation pathways downwards.
 
 ## Reproducibility note
 
 Versions are pinned because PyPSA 1.0 (released early 2026) introduced a
 regression in multi_investment_periods. Last working stable version is 0.35.1.
 Do not upgrade PyPSA mid-project.
+
+tsam deprecation: TimeSeriesAggregation class will be removed in tsam v4.0.
+Migrate to tsam.aggregate() before any future version upgrade.
