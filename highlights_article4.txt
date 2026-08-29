@@ -1,0 +1,5 @@
+- All five European oil majors' climate targets map to MAC 13–16 €/tCO₂, below EU ETS price
+- Salt cavern storage (25 €/kg) eliminates Dunkelflaute cliff: baseline CO₂ -97% at -3% cost
+- WACC dominates green hydrogen LCOH (Spearman ρ=0.49), outweighing electrolyser CAPEX
+- Real option value zero under STEPS; +3.3 M€/100 MW under NZE, policy uncertainty is barrier
+- Storage need determined by Dunkelflaute severity, not annual wind CF, Rotterdam selects 386 GWh

@@ -1,94 +1,124 @@
-# Article 4 - Paris-aligned Green Hydrogen Pathways for European Oil Majors
+# Article 4 - Paris-Aligned Green Hydrogen Pathways for European Oil Majors
 
-PhD thesis (Ernesto Relogio, Universidade de Aveiro).
-Multi-firm energy system optimisation framework with stochastic LCOH and
-real options analysis under climate budget constraints.
+**Manuscript:** APEN-D-26-12979 | **Journal:** Applied Energy
 
-## Folder structure
+PhD thesis — Ernesto Relogio, Universidade de Aveiro
+ORCID: 0000-0002-3784-2848 | relog12@ua.pt
+
+## Title
+Paris-Aligned Green Hydrogen Pathways for European Oil Majors:
+Multi-Period Optimisation, Stochastic LCOH, Hydrogen Storage,
+Renewable Profile Sensitivity, and Real Options Analysis
+
+---
+
+## Methodological corrections (revision v2)
+
+Three corrections were applied following peer review:
+
+1. **Storage formulation (e_cyclic)**: Changed from `e_cyclic=True`
+   to `e_cyclic=False` in the PyPSA Store component, enabling
+   inter-period energy transfer for seasonal salt cavern storage.
+   Following Kotzur et al. (2018). Result: baseline CO2 falls
+   to zero (not 97%) with correct seasonal buffering.
+
+2. **LSM terminal condition**: Applied `max(payoff_2050, 0)` at
+   the terminal date, bounding option values at zero as required
+   by option theory. Corrected values: STEPS +3.1, APS +5.0,
+   NZE +7.1 MEur per 100 MW PEM.
+
+3. **Monte Carlo electrolyser CF**: Changed from fixed CF=0.45 to
+   endogenous CF_elec = min(CF_renov x 1.5, 1.0). Wind CF is now
+   the dominant LCOH driver (Spearman rho = -0.47). P50 LCOH =
+   4.85 EUR/kg (corrected from 5.32 EUR/kg).
+
+---
+
+## Repository structure
 
     Article4/
-    |-- notebooks/              Jupyter notebooks
-    |-- data/                   Excel workbook + raw downloads
-    |-- results/                Model outputs
-    |-- refs/                   Reference PDFs
-    |-- requirements.txt        Frozen Python dependencies
-    |-- environment.yml         Conda environment specification
+    |-- notebooks/
+    |   |-- 01_smoke_test.ipynb              Main model notebook
+    |   |-- article4_style.py               Figure style module
+    |   |-- layer2_monte_carlo_lcoh_fixed.py Layer 2 MC (corrected)
+    |   `-- layer3_real_options_fixed.py     Layer 3 LSM (corrected)
+    |-- data/
+    |   |-- oil_majors_h2_data_collection.xlsx  Model parameters
+    |   |-- real_profiles_DE_2019.csv           Solar/wind profiles
+    |   |-- real_profiles_Rotterdam_2019.csv
+    |   `-- real_profiles_Tarragona_2019.csv
+    |-- results/
+    |   |-- macc_sweep_v4_fixed.csv         MACC results (corrected)
+    |   |-- lcoh_mc_v3_final.csv            MC LCOH (corrected)
+    |   |-- real_options_ls_fixed.csv       LSM results (corrected)
+    |   `-- figures/                         Publication figures
+    |-- refs/                                Reference PDFs
+    |-- requirements.txt                     Frozen dependencies
+    |-- environment.yml                      Conda environment
     `-- README.md
+
+---
 
 ## Environment
 
-Python 3.11, PyPSA 0.35.1, HiGHS solver. To rebuild:
+Python 3.11, PyPSA 0.35.1, HiGHS solver.
 
     conda create -n tese-h2 python=3.11 -y
     conda activate tese-h2
     pip install -r requirements.txt
 
-## Methodology in three layers
+**IMPORTANT**: Do not upgrade PyPSA beyond 0.35.1.
+PyPSA 1.0 introduced a regression in multi_investment_periods.
 
-L1: Deterministic capacity expansion (5 firms x 3 climate scenarios x 2 foresight modes = 30 runs). PyPSA + HiGHS.
-L2: Stochastic LCOH on fixed capacities (10000 MC). NumPy / pandas.
-L3: Real options analysis (Longstaff-Schwartz). NumPy.
+---
 
-## Temporal representation
+## Three-layer methodology
 
-Time series aggregation via tsam: 12 representative days + 2 extreme days,
-preserving annual means within 3 percent. Extreme days captured via addPeakMax
-on price and addPeakMin on solar, ensuring Dunkelflaute events constrain the
-capacity expansion decision. Resulting model: 2016 snapshots over 6 investment
-periods (2025-2050).
+**Layer 1 (PyPSA)**: Multi-period capacity expansion model.
+5 firms x 8 CO2 budgets x 2 storage configurations.
+14 representative days (12 typical + 2 extreme Dunkelflaute).
+Real DE 2019 profiles from renewables.ninja MERRA-2.
 
-## Climate scenarios (from IEA WEO)
+**Layer 2 (Monte Carlo)**: Stochastic LCOH with endogenous
+electrolyser CF. N=10,000, 11 triangular parameters.
+Audited sources: IEA GHR 2024, IRENA RPGC 2024, CHM 2024.
 
-- STEPS - Stated Policies
-- APS - Announced Pledges
-- NZE - Net Zero Emissions by 2050
+**Layer 3 (Longstaff-Schwartz)**: Real options analysis.
+Corrected terminal condition. N_paths=5,000.
+State variables: EU ETS + TTF GBM (vol 35%/y, 45%/y, rho=0.30).
 
-## Firms
+---
 
-Shell plc, TotalEnergies SE, BP plc, Eni S.p.A., Repsol S.A.
+## Key results (revised)
 
-## Status
+| Finding | Result |
+|---|---|
+| MACC plateau | 13-16 EUR/tCO2 to ~85% abatement |
+| Declared targets | All in flat zone (financially undemanding) |
+| Storage (corrected) | 100% CO2 reduction, -3% NPV |
+| LCOH P50 (corrected) | 4.85 EUR/kg |
+| Primary LCOH driver | Wind CF (rho = -0.47) |
+| Option value STEPS | +3.1 MEur/100 MW |
+| Option value NZE | +7.1 MEur/100 MW |
+| Investment barrier | Policy uncertainty > technology cost |
 
-- [x] Environment frozen (PyPSA 0.35.1, pandas 2.2.3, numpy 1.26.4)
-- [x] PyPSA multi-period model running (typical days, ~5s/run)
-- [x] Excel data template (12 sheets, defensive loaders)
-- [x] CO2 budget constraint per firm (GlobalConstraint, primary_energy)
-- [x] MACC pipeline (budget sweep + shadow prices + cost-emissions trade-off)
-- [x] Typical days via tsam (12 typical + 2 extreme, 14-day representation)
-- [x] Comparative analysis 24h synthetic vs typical days
-- [ ] Data collection in workbook (in progress)
-- [ ] Couple load_cost_params to PyPSA (replace placeholder CAPEX_TRAJ)
-- [ ] Additional supply technologies (H2 storage, H2 imports, blue H2)
-- [ ] Full 30-run pipeline (5 firms x 3 scenarios x 2 foresight modes)
-- [ ] L2 Monte Carlo LCOH
-- [ ] L3 Longstaff-Schwartz real options
-- [ ] Manuscript draft
+---
 
-## Key results so far (synthetic data, placeholder costs)
+## Data sources
 
-- 24h synthetic baseline: 2.62 MtCO2 cumulative 2025-2050, NPV 741 M EUR
-- Typical days baseline: 3.52 MtCO2 cumulative, NPV 750 M EUR (+34 percent CO2 for +1 percent NPV)
-- 50 percent CO2 budget: shadow price 114 EUR/tCO2 (with 24h)
-- Typical days expose technical infeasibility for budgets below 10 percent
-  of baseline, indicating that >90 percent decarbonisation via supply-side
-  alone requires technologies absent from current model (H2 imports, long
-  duration storage, or blue H2).
+- IEA Global Hydrogen Review 2024
+- IRENA Renewable Power Generation Costs 2023
+- Clean Hydrogen Monitor 2024 (Hydrogen Europe)
+- ENTSO-E DE/NL/ES 2019 electricity prices
+- renewables.ninja MERRA-2 reanalysis (2019)
+- OPSD DE solar/wind profiles 2019
 
-## Methodology notes for paper
+---
 
-- tsam aggregation preserves annual means within 3 percent for solar CF,
-  2 percent for wind CF, 0.1 percent for electricity price.
-- Cluster 12 (2 days per year, wind CF 0.006, price 91 EUR/MWh) acts as
-  Dunkelflaute event that materially constrains firm capacity sizing.
-- Models that omit such extreme days systematically over-estimate the
-  share of renewable supply that is economically rational, biasing
-  decarbonisation pathways downwards.
+## Citation
 
-## Reproducibility note
+Relogio, E. (2026). Paris-Aligned Green Hydrogen Pathways for
+European Oil Majors. Applied Energy. APEN-D-26-12979.
 
-Versions are pinned because PyPSA 1.0 (released early 2026) introduced a
-regression in multi_investment_periods. Last working stable version is 0.35.1.
-Do not upgrade PyPSA mid-project.
-
-tsam deprecation: TimeSeriesAggregation class will be removed in tsam v4.0.
-Migrate to tsam.aggregate() before any future version upgrade.
+## Audit status
+SHEET09_AUDIT_STATUS = AUDITED_IEA_IRENA_CHM_2024

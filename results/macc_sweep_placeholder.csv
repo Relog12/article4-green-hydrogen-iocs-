@@ -1,0 +1,9 @@
+fraction,label,co2_realised_MtCO2,abated_MtCO2,npv_eur,shadow_price_eur_tco2,feasible
+1.0,Unconstrained,3.524,0.0,750173870.4347595,,True
+0.9,90% of baseline,0.634,2.89,1773955878.9277308,599.7414447343717,True
+0.75,75% of baseline,0.5269999999999999,2.997,2215008782.5098534,1204.7613860747147,True
+0.5,50% of baseline,0.35200000000000004,3.172,5550263595.718024,9407.126534070016,True
+0.25,25% of baseline,0.176,3.348,32995231810.181984,118302.41564639333,True
+0.1,10% of baseline,,,,,False
+0.05,5% of baseline,,,,,False
+0.0,0% of baseline,,,,,False
