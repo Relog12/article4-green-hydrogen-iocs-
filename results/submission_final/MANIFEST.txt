@@ -1,0 +1,44 @@
+SUBMISSION FINAL — Article4 APEN-D-26-12979
+Generated: 2026-08-29 17:10
+============================================================
+
+FIGURES (6 figures x PNG + PDF):
+  Fig1_MACC_panels.pdf
+  Fig2_MACC_storage.pdf
+  Fig3_MonteCarlo_LCOH.pdf
+  Fig4_RealOptions.pdf
+  Fig5_Geographic.pdf
+  Fig6_MACC_Sensitivity.pdf
+
+SUPPLEMENTARY DATA (CSV):
+  Table_S1_MACC_sweep.csv
+  Table_S2_LCOH_MC.csv
+  Table_S3_RealOptions.csv
+  Table_S4_Paris_mapping.csv
+  Table_S5_Geographic.csv
+  Table_S6_Model_comparison.csv
+
+MANUSCRIPT FILES (upload separately to Editorial Manager):
+  Article4_manuscript_v6_final.docx
+  Response_to_Reviewers_APEN-D-26-12979.docx
+
+FIGURE DESCRIPTIONS:
+  Fig1  - Multi-firm MACCs (Layer 1a, without storage)
+          5 panels, one per firm. Flat plateau + Dunkelflaute cliff.
+  Fig2  - MACC with vs without salt cavern storage
+          5 panels. Corrected e_cyclic=False formulation.
+  Fig3  - Monte Carlo LCOH distribution (N=10,000)
+          Endogenous electrolyser CF. Spearman tornado.
+  Fig4  - Longstaff-Schwartz real options (corrected)
+          NPV distributions + exercise timing + option values.
+  Fig5  - Geographic sensitivity (3 locations)
+          Renewable CFs, Dunkelflaute, CO2/NPV outcomes.
+  Fig6  - MACC sensitivity to profile assumptions
+          3 rows x 5 columns panel layout.
+
+CORRECTIONS APPLIED:
+  1. e_cyclic=False (seasonal storage)
+  2. LSM terminal condition max(payoff,0)
+  3. Monte Carlo CF_elec endogenous
+  4. Sections 4.5 vs 4.7 contradiction resolved
+  5. Five firms moderated to stylised cases
