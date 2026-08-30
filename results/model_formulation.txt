@@ -1,0 +1,103 @@
+
+MATHEMATICAL FORMULATION — Layer 1 PyPSA Model
+===============================================
+
+SETS AND INDICES:
+  t ∈ T          : snapshots (representative hours)
+  y ∈ Y          : investment periods {2025,2030,...,2050}
+  g ∈ G          : generators (solar, wind, SMR, grid, imports)
+  l ∈ L          : links (PEM electrolysers)
+  s ∈ S          : stores (salt cavern)
+  b ∈ B          : buses (power AC, hydrogen H2)
+
+DECISION VARIABLES:
+  p_{g,t}        : generator dispatch [MW]
+  f_{l,t}        : link flow [MW]
+  e_{s,t}        : store energy level [MWh]
+  P^{nom}_{g,y}  : installed capacity of generator g, vintage y [MW]
+  F^{nom}_{l,y}  : installed capacity of link l, vintage y [MW]
+  E^{nom}_{s,y}  : installed capacity of store s, vintage y [MWh]
+
+OBJECTIVE FUNCTION (minimise NPV of system cost):
+
+  min  Σ_y  δ_y · Δy · [
+         Σ_g  (c^{cap}_{g,y} · P^{nom}_{g,y}
+               + Σ_t  w_t · c^{mar}_{g} · p_{g,t})
+       + Σ_l  (c^{cap}_{l,y} · F^{nom}_{l,y})
+       + Σ_s  (c^{cap}_{s,y} · E^{nom}_{s,y})
+       ]
+
+  where:
+    δ_y  = (1 + r)^{-(y - y_0)}   discount factor (r = 5%)
+    Δy   = 5                        years per investment period
+    w_t  = snapshot weighting (hours/year represented by snapshot t)
+    c^{cap}_{g,y} = CAPEX_{g,y} · CRF_{g}   annualised capital cost
+    CRF_{g}       = WACC / (1 - (1+WACC)^{-n_g})
+
+CONSTRAINTS:
+
+1. ENERGY BALANCE — power bus (AC):
+   Σ_g p_{g,t} - Σ_l f_{l,t} = 0      ∀t ∈ T
+
+2. ENERGY BALANCE — hydrogen bus (H2):
+   Σ_g p_{g,t} + Σ_l η_l · f_{l,t}
+   + (e_{s,t-1} - e_{s,t}) · η^{dis}_s = d_{H2,t}    ∀t ∈ T
+
+   where d_{H2,t} = firm hydrogen demand [MWh/h]
+         η_l      = PEM efficiency [MWh_H2/MWh_elec]
+         η^{dis}  = cavern discharge efficiency
+
+3. GENERATOR CAPACITY:
+   0 ≤ p_{g,t} ≤ cf_{g,t} · P^{nom}_{g,y}    ∀g,t,y
+   (cf_{g,t} = renewable capacity factor for solar/wind)
+
+4. STORE ENERGY BALANCE (e_cyclic=False — CORRECTED):
+   e_{s,t} = (1 - λ_s) · e_{s,t-1}
+             + η^{ch}_s · f^{ch}_{s,t}
+             - f^{dis}_{s,t} / η^{dis}_s     ∀s,t
+
+   where λ_s = 0.00005/h (standing loss, salt cavern)
+   Note: e_cyclic=False allows e_{s,T} ≠ e_{s,0},
+         enabling inter-period seasonal energy transfer.
+         Prior formulation (e_cyclic=True) forced
+         e_{s,T} = e_{s,0} within each representative
+         day, preventing seasonal buffering.
+
+5. STORE CAPACITY:
+   0 ≤ e_{s,t} ≤ E^{nom}_{s,y}    ∀s,t,y
+
+6. CO2 BUDGET CONSTRAINT (optional):
+   Σ_t Σ_g w_t · ε_g · p_{g,t} ≤ B^{CO2}
+
+   where ε_g = CO2 intensity [tCO2/MWh]
+     ε_{SMR} = 0.30 tCO2/MWh_H2
+     ε_{grid}= 0.25 tCO2/MWh_elec
+
+   B^{CO2} = α · Σ_t Σ_g w_t · ε_g · p^{base}_{g,t}
+   α ∈ {0%, 5%, 10%, 25%, 50%, 75%, 90%, 100%}
+
+7. VINTAGE TRACKING (multi-period):
+   Active capacity at time t from vintage y:
+   P^{nom}_{g,y} > 0 only if y ≤ t ≤ y + n_g
+   (assets retire after lifetime n_g)
+
+PARAMETERS:
+
+  Technology          CAPEX 2025    CAPEX 2050    Lifetime
+  ─────────────────────────────────────────────────────
+  Solar PV            800 €/kW      480 €/kW      25y
+  Onshore wind      1,300 €/kW      980 €/kW      25y
+  PEM electrolysis  1,500 €/kW      800 €/kW      20y
+  Salt cavern         750 €/MWh      —            30y
+  SMR (grey)         marginal 40 €/MWh_H2          —
+  Grid import        marginal 80 €/MWh_elec         —
+  H2 imports         marginal 70→43 €/MWh_H2        —
+
+  WACC (firm-specific): Shell 8%, TotalEnergies 7.5%,
+                        BP 8.5%, Eni 7%, Repsol 7.5%
+
+SOLVER: HiGHS (open-source LP/MIP solver)
+        via linopy interface in PyPSA 0.35.1
+        Typical solve time: 50-170s per run
+        Solution: ~51,000 primal variables,
+                  ~99,000 dual variables

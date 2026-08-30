@@ -1,0 +1,52 @@
+SUBMISSION FINAL v2 — APEN-D-26-12979
+Generated: 2026-08-30 23:18
+==============================================================
+
+FIGURES (28 files):
+
+  Original 6 (revised):
+  Fig01 - Multi-firm MACCs (Layer 1a)
+  Fig02 - MACC with/without storage (Layer 1b, corrected)
+  Fig03 - Monte Carlo LCOH (endogenous CF, corrected)
+  Fig04 - Real options LSM (corrected terminal condition)
+  Fig05 - Geographic sensitivity (3 locations × 3 years)
+  Fig06 - MACC sensitivity to profile assumptions
+
+  New figures (revision v2):
+  Fig00 - Three-layer framework overview
+  Fig07 - Policy counterfactuals (WACC vs CAPEX)
+  Fig08 - LSM validation vs Black-Scholes / L&S 2001
+  Fig09 - Paris pathway budget derivation
+  Fig10 - Real data validation (Shell HH1 + Repsol)
+  Fig11 - Geographic sensitivity (6 locations × 3 years)
+  Fig12 - Sannazzaro special case analysis
+  Fig13 - Monte Carlo convergence test
+
+SUPPLEMENTARY DATA (9 CSV files):
+  Table_S1 - MACC sweep results (5 firms × 8 budgets)
+  Table_S2 - LCOH Monte Carlo (N=10,000)
+  Table_S3 - Real options LSM results
+  Table_S4 - Paris budget derivation
+  Table_S5 - Geographic analysis (6 locations × 3 years)
+  Table_S6 - Sannazzaro detailed analysis
+  Table_S7 - Monte Carlo parameter sources
+  Table_S8 - Real firm data (Shell, Repsol)
+  Table_S9 - Multi-year PyPSA results
+
+MANUSCRIPT FILES (upload separately):
+  Article4_manuscript_v6_final.docx
+  Response_to_Reviewers_APEN-D-26-12979.docx
+
+KEY CORRECTIONS (revision v2):
+  1. e_cyclic=False (seasonal storage) → CO2=0
+  2. LSM terminal max(payoff,0) → all values positive
+  3. MC CF_elec endogenous → P50=4.85 EUR/kg
+  4. Multi-year analysis 2019-2021 (3 years)
+  5. 6 refinery locations (added Antwerp, Normandy, Sannazzaro)
+  6. Sannazzaro special case (338h Dunkelflaute)
+  7. Policy counterfactuals (WACC vs CAPEX)
+  8. LSM validation vs Black-Scholes (RMSE=0.026)
+  9. Paris budget derivation (NZE=26.4%)
+  10. Real data validation (Shell HH1, Repsol Puertollano)
+  11. MC convergence test (stable at N>=5,000)
+  12. MC parameter sources table (11 parameters)
