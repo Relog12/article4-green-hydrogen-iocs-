@@ -1,0 +1,7 @@
+pypsa==0.35.1
+pandas==2.2.3
+numpy==1.26.4
+scipy
+matplotlib
+tsam
+highspy
